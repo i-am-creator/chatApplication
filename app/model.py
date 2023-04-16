@@ -19,7 +19,7 @@ class User:
     name: str = ""
     last_active: datetime.datetime = datetime.datetime.now()
     id: Union[str, int] = ''
-    password: str = '**************'
+    password: str = '***'
     current_connection: Optional[WebSocket] = None
     is_active: bool = False
     connection_id = None

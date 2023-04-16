@@ -70,13 +70,15 @@
             console.log("Name is : " + username)
             connect();
             console.log("Connected !!!! ")
-            function connect() {
 
+
+            function connect() {
                 console.log("Connecting started")
-                console.log("ws = new WebSocket(`{{ WebSocketURL }}${client_id}?username=${ encodeURIComponent(username) }`)");
+                console.log(username)
+
+<!--                console.log("ws = new WebSocket(`{{ WebSocketURL }}${client_id}?username=${ encodeURIComponent(username) }`)");-->
 <!--                ws = new WebSocket(`{{ WebSocketURL }}${client_id}`);-->
                 if (isNaN(ws) ){
-                        console.log("ws is NaN")
                         client_id = Date.now()
                         document.querySelector("#ws-id").textContent = client_id;
                         ws = new WebSocket(`{{ WebSocketURL }}${client_id}?username=${ encodeURIComponent(username) }`);
@@ -86,7 +88,6 @@
                 }
                 else {
                         console.log("WS :",  ws.readyState)
-
                         client_id = Date.now()
                         document.querySelector("#ws-id").textContent = client_id;
                         ws = new WebSocket(`{{ WebSocketURL }}${client_id}?username=${ encodeURIComponent(username) }`);
@@ -107,7 +108,7 @@
                 ws.onclose = function() {
                     document.querySelector("#status").textContent = "Disconnected"
                     document.querySelector("#status").classList.replace("connected" , "disconnected")
-                    setTimeout(connect, 500); // retry every .5 seconds
+                    setTimeout(connect, 5000); // retry every .5 seconds
                 };
             }
 
@@ -127,8 +128,8 @@
             var messageForm = document.querySelector("#messageForm");
             messageForm.addEventListener("submit", sendMessage);
 
-            var username = document.querySelector("#update-name");
-            username.addEventListener("click", connectwithname);
+            var usernameForm = document.querySelector("#update-name");
+            usernameForm.addEventListener("click", connectwithname);
 
 
         </script>

@@ -3,6 +3,9 @@ import datetime
 from starlette.websockets import WebSocket
 
 from app.model import User
+from sql_app import crud
+from sql_app.schemas import UserCreate, WsConnectionCreate
+
 
 fake_user_db: list[User] = []
 
@@ -12,14 +15,15 @@ class UserManagement:
     user_db: list[User] = fake_user_db
 
     @staticmethod
-    def getInstance():
+    def getInstance(db):
         """Static Access Method"""
         if UserManagement.__shared_instance is None:
-            UserManagement()
+            UserManagement(db)
         return UserManagement.__shared_instance
 
-    def __init__(self):
+    def __init__(self, db):
         """virtual private constructor"""
+        self.db = db
         if UserManagement.__shared_instance is not None:
             raise Exception("This class is a singleton class !")
         else:
@@ -47,35 +51,18 @@ class UserManagement:
             if u.connection_id == connection_id:
                 return u.name
 
-
     def connect_user(self, websocket: WebSocket, connection_id, username):
-        user_exists = False
-        for i in range(len(self.user_db)):
-            if self.user_db[i].name == username:
-                self.user_db[i].current_connection = websocket
-                self.user_db[i].connection_id = connection_id
-                self.user_db[i].is_active = True
-                self.user_db[i].last_active = datetime.datetime.now()
-                user_exists = True
-        if not user_exists:
-            user = User(current_connection=websocket)
-            user.is_active = True
-            user.connection_id = connection_id
-            user.name = username
-            self.user_db.append(user)
+        db_user = crud.get_user_by_name(self.db, username)
+        if not db_user:
+            user = UserCreate(**{'name': username})
+            db_user = crud.create_user(self.db, user)
 
+        conn = WsConnectionCreate(**{'id':connection_id})
+        connection = crud.create_connection(self.db, conn, user_id=db_user.id)
 
+        print(connection)
+        return connection.id
 
     def disconnect_user(self, connection_id):
-        for i in range(len(self.user_db)):
-            if self.user_db[i].connection_id == connection_id:
-                # self.user_db[i].connection_id = None
-                self.user_db[i].current_connection = None
-                self.user_db[i].is_active = False
-                self.user_db[i].last_active = datetime.datetime.now()
-                self.user_db[i].prev_connection_id.append(connection_id)
-
-
-
-
-
+        crud.close_connection(self.db, connection_id)
+        return crud.get_user_by_cid(self.db, connection_id)
