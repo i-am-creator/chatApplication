@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+    app:
+        image: chat_application
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        volumes:
+            -   ./html-template/:/code/html-template:ro
+        ports:
+            -   8000:80
+        restart: always
+        depends_on:
+            -   db
+#        env_file:
+#            -   .env
+        environment:
+            - WebSocketURL=ws://localhost:8000/ws/
+            - DRIVER=postgresql
+            - DB_USER_NAME=chitransh
+            - DB_PASSWORD=VaryGoodPassword
+            - DB_HOST=postgres
+            - DB_NAME=chat_app
+        networks:
+            - network
+    db:
+        hostname: postgres
+        image: postgres:14.1-alpine
+        restart: always
+        environment:
+            - POSTGRES_DB=chat_app
+            - POSTGRES_USER=chitransh
+            - POSTGRES_PASSWORD=VaryGoodPassword
+        ports:
+            - '5432:5432'
+        volumes:
+            - db:/var/lib/postgresql/data
+        networks:
+            - network
+networks:
+    network:
+        name: chat_network
+
+volumes:
+  db:
+    driver: local
+    name: postgres

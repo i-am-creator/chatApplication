@@ -12,7 +12,7 @@ docker build -t mychat .
 
 Deploy container :
 ```shell
-docker run -d --env-file .env --name mycontainer -p 8000:80 myimage
+docker run -d --env-file .env --name mycontainer -p 8000:80 mychat
 ```
 
 app_url : http:localhost:8000
