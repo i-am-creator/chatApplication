@@ -68,8 +68,8 @@
             var username = nameList[Math.floor( Math.random() * nameList.length )];
             document.querySelector("#usernameText").value = username
             console.log("Name is : " + username)
-            connect();
-            console.log("Connected !!!! ")
+<!--            connect();-->
+<!--            console.log("Connected !!!! ")-->
 
 
             function connect() {
@@ -122,7 +122,7 @@
             function connectwithname(event) {
                 event.preventDefault(); // prevent form submission
                 username = document.getElementById("usernameText").value
-                ws.close();
+                if (isNaN(ws)){ connect(); } else { ws.close();}
 
             }
             var messageForm = document.querySelector("#messageForm");

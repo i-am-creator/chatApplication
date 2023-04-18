@@ -1,24 +1,11 @@
-from starlette.websockets import WebSocket, WebSocketDisconnect
-from app.dependencies import Connection
 from fastapi import APIRouter, Depends
-
 from sqlalchemy.orm import Session
-from sql_app import crud, models, schemas
-from sql_app.database import SessionLocal, engine
+from starlette.websockets import WebSocket
 
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
+from app.dependencies import Connection
+from app.dependencies import get_db
 
 ws_router = APIRouter(prefix='/ws', tags=['ws'])
-
-
-# manager = ConnectionManager()
 
 
 @ws_router.websocket("/{client_id}")
