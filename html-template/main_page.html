@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat</title>
+        <style>
+            #status {
+                font-weight: bold;
+            }
+
+            .connected {
+                color: green;
+            }
+
+            .disconnected {
+                color: red;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>WebSocket Chat</h1>
+        <form id="connectionForm">
+            <label>Username:</label>
+            <input type="text" id="usernameText" name="username">
+            <button id="update-name">Connect</button>
+        </form>
+        <h2>Your ID: <span id="ws-id"></span></h2>
+        <p>Connection Status: <span id="status" class="disconnected">Connecting...</span></p>
+
+        <form id="messageForm">
+            <input type="text" id="messageText" autocomplete="off"/>
+            <button type="submit">Send</button>
+        </form>
+        <ul id='messages'>
+        </ul>
+        <script>
+            console.log("Script started")
+            var client_id = Date.now()
+            var nameList = [
+                'Time','Past','Future','Dev',
+                'Fly','Flying','Soar','Soaring','Power','Falling',
+                'Fall','Jump','Cliff','Mountain','Rend','Red','Blue',
+                'Green','Yellow','Gold','Demon','Demonic','Panda','Cat',
+                'Kitty','Kitten','Zero','Memory','Trooper','XX','Bandit',
+                'Fear','Light','Glow','Tread','Deep','Deeper','Deepest',
+                'Mine','Your','Worst','Enemy','Hostile','Force','Video',
+                'Game','Donkey','Mule','Colt','Cult','Cultist','Magnum',
+                'Gun','Assault','Recon','Trap','Trapper','Redeem','Code',
+                'Script','Writer','Near','Close','Open','Cube','Circle',
+                'Geo','Genome','Germ','Spaz','Shot','Echo','Beta','Alpha',
+                'Gamma','Omega','Seal','Squid','Money','Cash','Lord','King',
+                'Duke','Rest','Fire','Flame','Morrow','Break','Breaker','Numb',
+                'Ice','Cold','Rotten','Sick','Sickly','Janitor','Camel','Rooster',
+                'Sand','Desert','Dessert','Hurdle','Racer','Eraser','Erase','Big',
+                'Small','Short','Tall','Sith','Bounty','Hunter','Cracked','Broken',
+                'Sad','Happy','Joy','Joyful','Crimson','Destiny','Deceit','Lies',
+                'Lie','Honest','Destined','Bloxxer','Hawk','Eagle','Hawker','Walker',
+                'Zombie','Sarge','Capt','Captain','Punch','One','Two','Uno','Slice',
+                'Slash','Melt','Melted','Melting','Fell','Wolf','Hound',
+                'Legacy','Sharp','Dead','Mew','Chuckle','Bubba','Bubble','Sandwich',
+                'Smasher','Extreme','Multi','Universe','Ultimate','Death','Ready',
+                'Monkey','Elevator','Wrench','Grease','Head','Theme','Grand','Cool',
+                'Kid','Boy','Girl','Vortex','Paradox'
+            ];
+
+            document.querySelector("#ws-id").textContent = client_id;
+            var status = document.querySelector("#status");
+            var ws;
+            var username = nameList[Math.floor( Math.random() * nameList.length )];
+            document.querySelector("#usernameText").value = username
+            console.log("Name is : " + username)
+<!--            connect();-->
+<!--            console.log("Connected !!!! ")-->
+
+
+            function connect() {
+                console.log("Connecting started")
+                console.log(username)
+
+<!--                console.log("ws = new WebSocket(`{{ WebSocketURL }}${client_id}?username=${ encodeURIComponent(username) }`)");-->
+<!--                ws = new WebSocket(`{{ WebSocketURL }}${client_id}`);-->
+                if (isNaN(ws) ){
+                        client_id = Date.now()
+                        document.querySelector("#ws-id").textContent = client_id;
+                        ws = new WebSocket(`{{ WebSocketURL }}${client_id}?username=${ encodeURIComponent(username) }`);
+                } else if (ws.readyState == 1 || ws.readyState == ws.CONNECTING) {
+                        console.log("ws is :"+ ws.readyState)
+                        console.log("ws is connecting plz wait")
+                }
+                else {
+                        console.log("WS :",  ws.readyState)
+                        client_id = Date.now()
+                        document.querySelector("#ws-id").textContent = client_id;
+                        ws = new WebSocket(`{{ WebSocketURL }}${client_id}?username=${ encodeURIComponent(username) }`);
+                }
+
+
+                ws.onopen = function() {
+                    document.querySelector("#status").textContent = "Connected"
+                    document.querySelector("#status").classList.replace("disconnected" , "connected")
+                };
+                ws.onmessage = function(event) {
+                    var messages = document.getElementById('messages')
+                    var message = document.createElement('li')
+                    var content = document.createTextNode(event.data)
+                    message.appendChild(content)
+                    messages.appendChild(message)
+                };
+                ws.onclose = function() {
+                    document.querySelector("#status").textContent = "Disconnected"
+                    document.querySelector("#status").classList.replace("connected" , "disconnected")
+                    setTimeout(connect, 5000); // retry every .5 seconds
+                };
+            }
+
+            function sendMessage(event) {
+                event.preventDefault(); // prevent form submission
+                var input = document.getElementById("messageText")
+                ws.send(input.value)
+                input.value = ''
+            }
+
+            function connectwithname(event) {
+                event.preventDefault(); // prevent form submission
+                username = document.getElementById("usernameText").value
+                if (isNaN(ws)){ connect(); } else { ws.close();}
+
+            }
+            var messageForm = document.querySelector("#messageForm");
+            messageForm.addEventListener("submit", sendMessage);
+
+            var usernameForm = document.querySelector("#update-name");
+            usernameForm.addEventListener("click", connectwithname);
+
+
+        </script>
+    </body>
+</html>
+
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Chat</title>-->
+<!--</head>-->
+<!--        <h1>WebSocket Chat</h1>-->
+<!--        <form action="" onsubmit="connect(event)">-->
+<!--            <label>Your Name: <input type="text" id="name" autocomplete="off" value="theCreator"/></label>-->
+<!--            <button onclick="connect(event)">Connect</button>-->
+<!--        </form>-->
+<!--        <hr>-->
+<!--        <h2>Your Connection ID: <span id="ws-id"></span></h2>-->
+<!--        <hr>-->
+<!--        <form action="" onsubmit="sendMessage(event)">-->
+<!--            <input type="text" id="messageText" autocomplete="off"/>-->
+<!--            <button>Send</button>-->
+<!--        </form>-->
+<!--        <ul id='messages'>-->
+<!--        </ul>-->
+<!--        <script>-->
+<!--            function connect(event) {-->
+<!--                var client_id = Date.now();-->
+<!--                var client_name =  document.getElementById("name").value;-->
+<!--                document.querySelector("#ws-id").textContent = client_id;-->
+<!--                var ws = new WebSocket(`{{ WebSocketURL }}${client_id}/${client_name}`);-->
+<!--                ws.onmessage = function(event) {-->
+<!--                        var messages = document.getElementById('messages')-->
+<!--                        var message = document.createElement('li')-->
+<!--                        var content = document.createTextNode(event.data)-->
+<!--                        message.appendChild(content)-->
+<!--                        messages.appendChild(message)-->
+<!--                    };-->
+<!--            event.preventDefault()-->
+<!--            }-->
+
+
+<!--            function sendMessage(event) {-->
+<!--                var input = document.getElementById("messageText")-->
+<!--                ws.send(input.value)-->
+<!--                input.value = ''-->
+<!--                event.preventDefault()-->
+<!--            }-->
+<!--        </script>-->
+<!--    </body>-->
+<!--</html>-->
