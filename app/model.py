@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional,  Union
+from typing import Optional, Union, List
 
 from fastapi import WebSocket
 from pydantic import BaseModel
@@ -24,7 +24,7 @@ class User:
     is_active: bool = False
     connection_id = None
 
-    prev_connection_id: list[int] = []
+    prev_connection_id: List[int] = []
 
     def __init__(self,current_connection:WebSocket):
         self.current_connection = current_connection

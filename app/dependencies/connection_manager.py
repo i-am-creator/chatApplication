@@ -17,8 +17,8 @@ class ConnectionManager:
 
     async def disconnect(self, client_id):
         user = self.user_db_manager.disconnect_user(connection_id=client_id)
-        print(f"{user.name} left the chat", CONNECTION_ID_OBJECT_MAP[client_id])
-        del CONNECTION_ID_OBJECT_MAP[client_id]
+        print(f"{user.name} left the chat", CONNECTION_ID_OBJECT_MAP.get(client_id, None))
+        CONNECTION_ID_OBJECT_MAP.pop(str(client_id), None)
         await self.broadcast(f"{user.name} left the chat")
 
     async def send_personal_message(self, message: str, websocket: WebSocket):
@@ -26,22 +26,22 @@ class ConnectionManager:
 
     async def broadcast(self, message: str):
         for connection_id in CONNECTION_ID_OBJECT_MAP.keys():
-            connection = CONNECTION_ID_OBJECT_MAP[connection_id]
+            connection = CONNECTION_ID_OBJECT_MAP.get(connection_id, None)
             if connection:
                 try:
                     await connection.send_text(message)
                 except WebSocketDisconnect:
-                    del CONNECTION_ID_OBJECT_MAP[connection_id]
+                    CONNECTION_ID_OBJECT_MAP.pop(connection_id, None)
 
     async def broadcast_to_others(self, message: str, websocket: WebSocket):
         for connection_id in CONNECTION_ID_OBJECT_MAP.keys():
-            connection = CONNECTION_ID_OBJECT_MAP[connection_id]
+            connection = CONNECTION_ID_OBJECT_MAP.get(connection_id, None)
             if connection and connection != websocket:
 
                 try:
                     await connection.send_text(message)
                 except WebSocketDisconnect:
-                    del CONNECTION_ID_OBJECT_MAP[connection_id]
+                    CONNECTION_ID_OBJECT_MAP.pop(connection_id, None)
 
     async def broadcast_to(self, message: str, connection_id: str):
         connection = CONNECTION_ID_OBJECT_MAP.get(connection_id, None)
@@ -49,7 +49,8 @@ class ConnectionManager:
             try:
                 await connection.send_text(message)
             except WebSocketDisconnect:
-                del CONNECTION_ID_OBJECT_MAP[connection_id]
+                pass
+                CONNECTION_ID_OBJECT_MAP.pop(connection_id, None)
 
     async def message_received(self, message, by):
         db_message = self.message_db_manager.createMessage(body=message, send_by=by.client_id)

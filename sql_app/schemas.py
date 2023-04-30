@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, List
 
 from pydantic import BaseModel
 
@@ -64,8 +64,8 @@ class WsConnection(WsConnectionBase):
     is_active: bool
 
     user: FakeUserBase
-    send_messages: list[MessageSender]
-    receive_messages: list[MessageReceiver]
+    send_messages: List[MessageSender]
+    receive_messages: List[MessageReceiver]
 
     class Config:
         orm_mode = True
@@ -74,7 +74,7 @@ class WsConnection(WsConnectionBase):
 class User(UserBase):
     id: int
     is_active: bool
-    connections: list[WsConnection] = []
+    connections: List[WsConnection] = []
 
     class Config:
         orm_mode = True

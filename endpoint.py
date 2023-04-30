@@ -2,6 +2,7 @@ import dotenv
 from fastapi import FastAPI, Depends
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
+from typing import List
 
 from app.dependencies import get_db
 from app.routers import ws_router, main_router
@@ -12,7 +13,7 @@ dotenv.load_dotenv()
 
 app = FastAPI()
 
-app.mount("/static/", StaticFiles(directory="./"), name="static")
+app.mount("/app", StaticFiles(directory="./html-template/", html=True), name="UI")
 app.include_router(ws_router)
 app.include_router(main_router)
 
@@ -34,19 +35,21 @@ def startup_event():
     db.close()
 
 
-@app.get("/users/", response_model=list[schemas.User])
+@app.get("/users/", response_model=List[schemas.User])
 def read_users(db: Session = Depends(get_db)):
     users = crud.get_all_user(db)
     return users
 
-@app.get("/connections/", response_model=list[schemas.WsConnection])
+
+@app.get("/connections/", response_model=List[schemas.WsConnection])
 def read_users(db: Session = Depends(get_db)):
     # users = crud.get_all_connections(db)
     users = crud.get_active_connection_ids(db)
     return users
 
 
-@app.get("/message/", response_model=list[schemas.Message])
+
+@app.get("/message/", response_model=List[schemas.Message])
 def read_message(db: Session = Depends(get_db)):
     users = crud.get_all_message(db)
     return users

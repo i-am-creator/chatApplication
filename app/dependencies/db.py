@@ -1,17 +1,18 @@
 import datetime
 
 from starlette.websockets import WebSocket
+from typing import List
 
 from app.model import User
 from sql_app import crud
 from sql_app.schemas import UserCreate, WsConnectionCreate, MessageCreate
 
-fake_user_db: list[User] = []
+fake_user_db: List[User] = []
 
 
 class UserManagement:
     __shared_instance = None
-    user_db: list[User] = fake_user_db
+    user_db: List[User] = fake_user_db
 
     @staticmethod
     def getInstance(db):
@@ -68,7 +69,7 @@ class UserManagement:
 
 class MessageManagement:
     __shared_instance = None
-    user_db: list[User] = fake_user_db
+    user_db: List[User] = fake_user_db
 
     @staticmethod
     def getInstance(db):
