@@ -32,9 +32,9 @@ def get_user_by_name(db: Session, name: str):
     return db.query(models.User).filter(models.User.name == name).first()
 
 
-def get_user_by_cid(db: Session, connection_id: int):
+def get_user_by_cid(db: Session, connection_id: str):
     return db.query(models.User).filter(models.WsConnection.user_id == models.User.id,
-                                        models.WsConnection.id == connection_id).first()
+                                        models.WsConnection.id == str(connection_id)).first()
 
 
 def create_user(db: Session, user: schemas.UserCreate):
@@ -62,16 +62,16 @@ def create_message(db: Session, message: schemas.MessageCreate):
     return db_item
 
 
-def create_sender(db: Session, message_id: int, connection_id: int):
-    db_item = models.MessageSender(**{"message_id": message_id, "sender_con_id": connection_id})
+def create_sender(db: Session, message_id: int, connection_id: str):
+    db_item = models.MessageSender(**{"message_id": message_id, "sender_con_id": str(connection_id)})
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
     return db_item
 
 
-def create_receiver(db: Session, message_id: int, connection_id: int):
-    db_item = models.MessageReceiver(**{"message_id": message_id, "receiver_con_id": connection_id})
+def create_receiver(db: Session, message_id: int, connection_id: str):
+    db_item = models.MessageReceiver(**{"message_id": message_id, "receiver_con_id": str(connection_id)})
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
@@ -83,7 +83,7 @@ def close_all_connection(db: Session):
     db.commit()
 
 
-def close_connection(db: Session, connection_id: int):
-    k = db.query(models.WsConnection).filter(models.WsConnection.id == connection_id).update(
+def close_connection(db: Session, connection_id: str):
+    k = db.query(models.WsConnection).filter(models.WsConnection.id == str(connection_id)).update(
         {models.WsConnection.is_active: False}, synchronize_session=False)
     db.commit()
