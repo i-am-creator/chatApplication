@@ -76,12 +76,12 @@
                 console.log("Connecting started")
                 console.log(username)
 
-<!--                console.log("ws = new WebSocket(`{{ WebSocketURL }}${client_id}?username=${ encodeURIComponent(username) }`)");-->
-<!--                ws = new WebSocket(`{{ WebSocketURL }}${client_id}`);-->
+<!--                console.log("ws = new WebSocket(`ws://${document.location.host}/ws/${client_id}?username=${ encodeURIComponent(username) }`))");-->
+<!--                ws = new WebSocket(`ws://${document.location.host}/ws/${client_id}?username=${ encodeURIComponent(username) }`);-->
                 if (isNaN(ws) ){
                         client_id = Date.now()
                         document.querySelector("#ws-id").textContent = client_id;
-                        ws = new WebSocket(`{{ WebSocketURL }}${client_id}?username=${ encodeURIComponent(username) }`);
+                        ws = new WebSocket(`ws://${document.location.host}/ws/${client_id}?username=${ encodeURIComponent(username) }`);
                 } else if (ws.readyState == 1 || ws.readyState == ws.CONNECTING) {
                         console.log("ws is :"+ ws.readyState)
                         console.log("ws is connecting plz wait")
@@ -90,7 +90,7 @@
                         console.log("WS :",  ws.readyState)
                         client_id = Date.now()
                         document.querySelector("#ws-id").textContent = client_id;
-                        ws = new WebSocket(`{{ WebSocketURL }}${client_id}?username=${ encodeURIComponent(username) }`);
+                        ws = new WebSocket(`ws://${document.location.host}/ws/${client_id}?username=${ encodeURIComponent(username) }`);
                 }
 
 
@@ -135,50 +135,3 @@
         </script>
     </body>
 </html>
-
-<!--<!DOCTYPE html>-->
-<!--<html lang="en">-->
-<!--<head>-->
-<!--    <meta charset="UTF-8">-->
-<!--    <title>Chat</title>-->
-<!--</head>-->
-<!--        <h1>WebSocket Chat</h1>-->
-<!--        <form action="" onsubmit="connect(event)">-->
-<!--            <label>Your Name: <input type="text" id="name" autocomplete="off" value="theCreator"/></label>-->
-<!--            <button onclick="connect(event)">Connect</button>-->
-<!--        </form>-->
-<!--        <hr>-->
-<!--        <h2>Your Connection ID: <span id="ws-id"></span></h2>-->
-<!--        <hr>-->
-<!--        <form action="" onsubmit="sendMessage(event)">-->
-<!--            <input type="text" id="messageText" autocomplete="off"/>-->
-<!--            <button>Send</button>-->
-<!--        </form>-->
-<!--        <ul id='messages'>-->
-<!--        </ul>-->
-<!--        <script>-->
-<!--            function connect(event) {-->
-<!--                var client_id = Date.now();-->
-<!--                var client_name =  document.getElementById("name").value;-->
-<!--                document.querySelector("#ws-id").textContent = client_id;-->
-<!--                var ws = new WebSocket(`{{ WebSocketURL }}${client_id}/${client_name}`);-->
-<!--                ws.onmessage = function(event) {-->
-<!--                        var messages = document.getElementById('messages')-->
-<!--                        var message = document.createElement('li')-->
-<!--                        var content = document.createTextNode(event.data)-->
-<!--                        message.appendChild(content)-->
-<!--                        messages.appendChild(message)-->
-<!--                    };-->
-<!--            event.preventDefault()-->
-<!--            }-->
-
-
-<!--            function sendMessage(event) {-->
-<!--                var input = document.getElementById("messageText")-->
-<!--                ws.send(input.value)-->
-<!--                input.value = ''-->
-<!--                event.preventDefault()-->
-<!--            }-->
-<!--        </script>-->
-<!--    </body>-->
-<!--</html>-->
